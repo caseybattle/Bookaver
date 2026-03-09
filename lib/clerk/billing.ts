@@ -17,8 +17,7 @@ export async function getUserPlan(): Promise<PlanType> {
   return plan ?? "free";
 }
 
-export async function getPlanLimits() {
-  const plan = await getUserPlan();
+export function getPlanLimits(plan: PlanType): { books: number; minutesPerMonth: number } {
   return PLAN_LIMITS[plan];
 }
 

@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   const [bookCount, sessions, plan] = await Promise.all([
     Book.countDocuments({ clerkId: userId }),
     VoiceSession.find({ clerkId: userId, billingMonth }).lean(),
-    getUserPlan(userId),
+    getUserPlan(),
   ]);
 
   const limits = getPlanLimits(plan);

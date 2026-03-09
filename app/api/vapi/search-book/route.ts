@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       .lean();
 
     const context = segments
-      .map((s) => `[Page ${s.pageNumber}, Segment ${s.segmentIndex}]\n${s.content}`)
+      .map((s) => `[Page ${s.pageNumber}, Segment ${s.chunkIndex}]\n${s.content}`)
       .join("\n\n---\n\n");
 
     return NextResponse.json({ context, count: segments.length });

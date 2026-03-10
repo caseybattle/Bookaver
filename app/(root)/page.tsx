@@ -41,7 +41,16 @@ export default async function HomePage({ searchParams }: HomeProps) {
       </Suspense>
 
       {/* Book grid */}
-      <BookGrid books={books.map((b) => ({ ...b, _id: b._id.toString() }))} />
+      <BookGrid
+        books={books.map((b) => ({
+          _id: b._id.toString(),
+          title: b.title,
+          author: b.author,
+          coverUrl: b.coverUrl,
+          pageCount: b.totalPages,
+          createdAt: b.createdAt instanceof Date ? b.createdAt.toISOString() : undefined,
+        }))}
+      />
     </div>
   );
 }

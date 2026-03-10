@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getBooks } from "@/lib/actions/book.actions";
-import BookCard from "@/components/BookCard";
+import BookGrid from "@/components/BookGrid";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -41,21 +41,7 @@ export default async function HomePage({ searchParams }: HomeProps) {
       </Suspense>
 
       {/* Book grid */}
-      {books.length === 0 ? (
-        <div className="text-center py-20 text-stone-400 dark:text-stone-500">
-          <p className="text-lg">No books yet.</p>
-          <p className="text-sm mt-1">Upload a PDF to get started.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {books.map((book) => (
-            <BookCard
-              key={book._id.toString()}
-              book={{ ...book, _id: book._id.toString() } as any}
-            />
-          ))}
-        </div>
-      )}
+      <BookGrid books={books.map((b) => ({ ...b, _id: b._id.toString() }))} />
     </div>
   );
 }

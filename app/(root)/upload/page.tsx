@@ -5,15 +5,15 @@ import Link from "next/link";
 export default function UploadPage() {
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <Link href="/" className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+      <Link href="/" className="flex items-center gap-2 text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-50 transition-colors">
         <ArrowLeft className="w-4 h-4" />
         Back to Library
       </Link>
       <div>
         <h1 className="text-2xl font-bold">Upload a Book</h1>
-        <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">Upload a PDF — we'll parse and index it for voice conversations.</p>
+        <p className="text-stone-500 dark:text-stone-400 mt-1 text-sm">Upload a PDF — we'll parse and index it for voice conversations.</p>
       </div>
-      <div className="bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6">
+      <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-6">
         <UploadForm />
       </div>
     </div>

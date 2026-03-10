@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { put, del } from "@vercel/blob";
 import { connectToDatabase } from "@/lib/db/mongoose";
-import Book from "@/lib/db/models/Book";
+import Book, { IBook } from "@/lib/db/models/Book";
 import Segment from "@/lib/db/models/Segment";
 import { getClerkId } from "@/lib/clerk/billing";
 import { extractAndSegmentPDF } from "@/lib/pdf/parser";
@@ -80,7 +80,7 @@ export async function getBooks(searchQuery?: string) {
 
   const books = await Book.find(query)
     .sort({ createdAt: -1 })
-    .lean()
+    .lean<IBook[]>()
     .exec();
 
   return books.map((book) => ({

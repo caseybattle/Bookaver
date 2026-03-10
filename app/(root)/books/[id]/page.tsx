@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import { connectToDatabase } from "@/lib/db/mongoose";
-import Book from "@/lib/db/models/Book";
+import Book, { IBook } from "@/lib/db/models/Book";
 import VoiceSession from "@/components/VoiceSession";
 import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
@@ -16,7 +16,7 @@ export default async function BookPage({ params }: BookPageProps) {
   if (!userId) notFound();
 
   await connectToDatabase();
-  const book = await Book.findOne({ _id: id, clerkId: userId }).lean();
+  const book = await Book.findOne({ _id: id, clerkId: userId }).lean<IBook>();
   if (!book) notFound();
 
   const assistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID ?? "";

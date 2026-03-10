@@ -1,4 +1,6 @@
 import { Suspense } from "react";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { getBooks } from "@/lib/actions/book.actions";
 import BookCard from "@/components/BookCard";
 import SearchBar from "@/components/SearchBar";
@@ -10,6 +12,9 @@ interface HomeProps {
 }
 
 export default async function HomePage({ searchParams }: HomeProps) {
+  const { userId } = await auth();
+  if (!userId) redirect("/sign-in");
+
   const { q } = await searchParams;
   const books = await getBooks(q);
 

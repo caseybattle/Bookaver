@@ -40,8 +40,9 @@ export async function extractAndSegmentPDF(
   for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
     const page = await pdf.getPage(pageNum);
     const textContent = await page.getTextContent();
-    const pageText = textContent.items
-      .map((item: { str?: string }) => item.str ?? "")
+    const pageText = (textContent.items as Array<{ str?: string }>)
+      .filter((item): item is { str: string } => typeof item.str === "string")
+      .map((item) => item.str)
       .join(" ");
 
     pageBreaks.push({ afterChar: allText.length + pageText.length, page: pageNum });

@@ -24,11 +24,11 @@ export default async function HomePage({ searchParams }: HomeProps) {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">My Library</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Talk to your books using AI</p>
+          <p className="text-stone-500 dark:text-stone-400 mt-1">Talk to your books using AI</p>
         </div>
         <Link
           href="/upload"
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-medium transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Book
@@ -42,7 +42,7 @@ export default async function HomePage({ searchParams }: HomeProps) {
 
       {/* Book grid */}
       {books.length === 0 ? (
-        <div className="text-center py-20 text-gray-400 dark:text-gray-500">
+        <div className="text-center py-20 text-stone-400 dark:text-stone-500">
           <p className="text-lg">No books yet.</p>
           <p className="text-sm mt-1">Upload a PDF to get started.</p>
         </div>

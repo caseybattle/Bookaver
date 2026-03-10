@@ -34,14 +34,14 @@ export default function MicrophoneButton({
         isActive
           ? "bg-red-500 hover:bg-red-400 shadow-lg shadow-red-500/30"
           : isConnecting || isEnding
-          ? "bg-gray-800"
-          : "bg-indigo-600 hover:bg-indigo-500 shadow-lg shadow-indigo-500/30"
+          ? "bg-stone-300 dark:bg-stone-700"
+          : "bg-amber-600 hover:bg-amber-500 shadow-lg shadow-amber-500/30"
       }`}
       aria-label={isActive ? "Stop conversation" : "Start conversation"}
     >
       {/* Pulse ring when AI is speaking */}
       {isSpeaking && (
-        <span className="absolute inset-0 rounded-full bg-indigo-500/30 animate-ping" />
+        <span className="absolute inset-0 rounded-full bg-amber-500/30 animate-ping" />
       )}
 
       {isConnecting || isEnding ? (

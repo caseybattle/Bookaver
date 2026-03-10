@@ -5,6 +5,7 @@ export interface IBook extends Document {
   title: string;
   author: string;
   blobUrl: string;
+  coverUrl?: string;
   totalPages: number;
   totalSegments: number;
   createdAt: Date;
@@ -17,6 +18,7 @@ const BookSchema = new Schema<IBook>(
     title: { type: String, required: true },
     author: { type: String, required: true },
     blobUrl: { type: String, required: true },
+    coverUrl: { type: String },
     totalPages: { type: Number, default: 0 },
     totalSegments: { type: Number, default: 0 },
   },

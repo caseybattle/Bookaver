@@ -21,10 +21,10 @@ export default function VoiceSession({ bookId, bookTitle, assistantId }: VoiceSe
   }, [assistantId, bookId, selectedPersonaId, startCall]);
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-2xl p-8 space-y-8">
+    <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 space-y-8">
       <div className="text-center space-y-2">
-        <h2 className="text-xl font-semibold">Talk to "{bookTitle}"</h2>
-        <p className="text-sm text-gray-400">
+        <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-50">Talk to "{bookTitle}"</h2>
+        <p className="text-sm text-stone-500 dark:text-stone-400">
           {callStatus === "idle"
             ? "Choose a voice persona and press the mic to start"
             : callStatus === "connecting"
@@ -44,8 +44,8 @@ export default function VoiceSession({ bookId, bookTitle, assistantId }: VoiceSe
               onClick={() => setSelectedPersonaId(persona.id)}
               className={`p-3 rounded-xl border text-left transition-colors ${
                 selectedPersonaId === persona.id
-                  ? "border-indigo-500 bg-indigo-500/10 text-white"
-                  : "border-gray-700 text-gray-400 hover:border-gray-600"
+                  ? "border-amber-500 bg-amber-500/10 text-stone-900 dark:text-stone-50"
+                  : "border-stone-300 dark:border-stone-700 text-stone-500 dark:text-stone-400 hover:border-stone-400 dark:hover:border-stone-600"
               }`}
             >
               <p className="font-medium text-sm">{persona.name}</p>
@@ -64,7 +64,7 @@ export default function VoiceSession({ bookId, bookTitle, assistantId }: VoiceSe
           onStop={stopCall}
         />
         {isSpeaking && (
-          <p className="text-sm text-indigo-400 animate-pulse flex items-center gap-1.5">
+          <p className="text-sm text-amber-600 dark:text-amber-400 animate-pulse flex items-center gap-1.5">
             <Mic className="w-3.5 h-3.5" />
             AI is speaking…
           </p>

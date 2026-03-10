@@ -8,6 +8,23 @@ import Segment from "@/lib/db/models/Segment";
 import { getClerkId } from "@/lib/clerk/billing";
 import { extractAndSegmentPDF } from "@/lib/pdf/parser";
 
+async function fetchBookCover(title: string, author: string): Promise<string | null> {
+  try {
+    const q = encodeURIComponent(`${title} ${author}`);
+    const res = await fetch(
+      `https://openlibrary.org/search.json?q=${q}&limit=1&fields=cover_i`,
+      { next: { revalidate: 86400 } }
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const coverId = data?.docs?.[0]?.cover_i;
+    if (!coverId) return null;
+    return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+  } catch {
+    return null;
+  }
+}
+
 export async function createBook(formData: FormData) {
   const clerkId = await getClerkId();
   const file = formData.get("file") as File;
@@ -24,6 +41,9 @@ export async function createBook(formData: FormData) {
 
   await connectToDatabase();
 
+  // Fetch cover image from OpenLibrary (non-blocking, best-effort)
+  const coverUrl = await fetchBookCover(title, author);
+
   // Upload PDF to Vercel Blob
   const blobPath = `books/${clerkId}/${Date.now()}-${file.name}`;
   const buffer = await file.arrayBuffer();
@@ -39,6 +59,7 @@ export async function createBook(formData: FormData) {
     title,
     author,
     blobUrl,
+    ...(coverUrl ? { coverUrl } : {}),
     totalPages: 0,
     totalSegments: 0,
   });

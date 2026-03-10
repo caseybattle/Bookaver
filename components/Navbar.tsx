@@ -22,7 +22,7 @@ export default function Navbar() {
           <Link href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors">
             Pricing
           </Link>
-          <UserButton afterSignOutUrl="/" />
+          <UserButton />
         </div>
       </div>
     </nav>

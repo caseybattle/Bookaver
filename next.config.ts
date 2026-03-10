@@ -5,10 +5,6 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "100mb",
     },
-    unstable_allowDynamic: [
-      "/node_modules/@clerk/**",
-      "/node_modules/@radix-ui/**",
-    ],
   },
   webpack: (config, { nextRuntime }) => {
     if (nextRuntime === "edge") {

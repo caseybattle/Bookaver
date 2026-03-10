@@ -46,7 +46,7 @@ export default function UploadForm() {
         onDrop={handleDrop}
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors ${
-          dragging ? "border-indigo-500 bg-indigo-500/5" : "border-gray-700 hover:border-gray-600"
+          dragging ? "border-indigo-500 bg-indigo-500/5" : "border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
         }`}
       >
         <input
@@ -60,14 +60,14 @@ export default function UploadForm() {
         {file ? (
           <div className="flex flex-col items-center gap-2">
             <FileText className="w-10 h-10 text-indigo-400" />
-            <p className="text-white font-medium">{file.name}</p>
-            <p className="text-sm text-gray-400">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
+            <p className="text-gray-900 dark:text-white font-medium">{file.name}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(1)} MB</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2">
-            <Upload className="w-10 h-10 text-gray-500" />
-            <p className="text-gray-300 font-medium">Drop your PDF here or click to browse</p>
-            <p className="text-sm text-gray-500">Up to 100 MB</p>
+            <Upload className="w-10 h-10 text-gray-400 dark:text-gray-500" />
+            <p className="text-gray-700 dark:text-gray-300 font-medium">Drop your PDF here or click to browse</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500">Up to 100 MB</p>
           </div>
         )}
       </div>
@@ -75,21 +75,21 @@ export default function UploadForm() {
       {/* Metadata */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-sm text-gray-400 mb-1.5">Title</label>
+          <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Title</label>
           <input
             name="title"
             required
             placeholder="Book title"
-            className="w-full px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
+            className="w-full px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
           />
         </div>
         <div>
-          <label className="block text-sm text-gray-400 mb-1.5">Author</label>
+          <label className="block text-sm text-gray-500 dark:text-gray-400 mb-1.5">Author</label>
           <input
             name="author"
             required
             placeholder="Author name"
-            className="w-full px-3 py-2.5 bg-gray-900 border border-gray-800 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
+            className="w-full px-3 py-2.5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-colors text-sm"
           />
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function UploadForm() {
       <button
         type="submit"
         disabled={!file || uploading}
-        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-800 disabled:text-gray-500 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+        className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
       >
         {uploading ? (
           <>

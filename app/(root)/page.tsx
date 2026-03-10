@@ -24,7 +24,7 @@ export default async function HomePage({ searchParams }: HomeProps) {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">My Library</h1>
-          <p className="text-gray-400 mt-1">Talk to your books using AI</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Talk to your books using AI</p>
         </div>
         <Link
           href="/upload"
@@ -42,7 +42,7 @@ export default async function HomePage({ searchParams }: HomeProps) {
 
       {/* Book grid */}
       {books.length === 0 ? (
-        <div className="text-center py-20 text-gray-500">
+        <div className="text-center py-20 text-gray-400 dark:text-gray-500">
           <p className="text-lg">No books yet.</p>
           <p className="text-sm mt-1">Upload a PDF to get started.</p>
         </div>

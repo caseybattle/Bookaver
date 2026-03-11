@@ -16,7 +16,7 @@
     "@radix-ui/react-separator": "^1",
     "@radix-ui/react-slot": "^1",
     "@vapi-ai/web": "^2",
-    "@vercel/blob": "^0",
+    "@vercel/blob": "^2.3.1",
     "class-variance-authority": "^0",
     "clsx": "^2",
     "lucide-react": "^0",

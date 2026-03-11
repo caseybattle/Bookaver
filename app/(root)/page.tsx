@@ -24,7 +24,7 @@ export default async function HomePage({ searchParams }: HomeProps) {
       {/* Hero Banner */}
       {!q && (
         <div className="rounded-2xl overflow-hidden" style={{ backgroundColor: "#f5ede0" }}>
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto_auto] gap-0">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px_auto] gap-0">
 
             {/* Left — headline + CTA */}
             <div className="px-8 py-10 flex flex-col justify-center gap-6">
@@ -56,14 +56,14 @@ export default async function HomePage({ searchParams }: HomeProps) {
               </div>
             </div>
 
-            {/* Center — AI illustration */}
-            <div className="hidden lg:flex items-center justify-center px-4 py-6" style={{ minWidth: "240px" }}>
+            {/* Center — AI illustration (banner-style: edge-to-edge, no frame, blends into bg) */}
+            <div className="hidden lg:flex items-end justify-center self-stretch overflow-hidden">
               <Image
                 src="/hero-illustration.png"
                 alt="Books, lamp, and globe illustration"
                 width={600}
                 height={335}
-                className="w-full h-auto max-w-[260px] rounded-xl"
+                className="w-full h-auto"
                 priority
               />
             </div>

@@ -30,6 +30,7 @@ export async function createBook(formData: FormData) {
   const file = formData.get("file") as File;
   const title = formData.get("title") as string;
   const author = formData.get("author") as string;
+  const prefilledCoverUrl = (formData.get("coverUrl") as string | null) || "";
 
   if (!file || !title || !author) {
     throw new Error("Missing required fields");
@@ -41,8 +42,8 @@ export async function createBook(formData: FormData) {
 
   await connectToDatabase();
 
-  // Fetch cover image from OpenLibrary (non-blocking, best-effort)
-  const coverUrl = await fetchBookCover(title, author);
+  // Use pre-filled cover from catalog search; fall back to OpenLibrary fetch
+  const coverUrl = prefilledCoverUrl || await fetchBookCover(title, author);
 
   // Upload PDF to Vercel Blob
   const blobPath = `books/${clerkId}/${Date.now()}-${file.name}`;

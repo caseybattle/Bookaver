@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         score: { $meta: "textScore" },
         content: 1,
         pageNumber: 1,
-        segmentIndex: 1,
+        chunkIndex: 1,
       }
     )
       .sort({ score: { $meta: "textScore" } })

@@ -1,17 +1,101 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Upload, FileText, Loader2 } from "lucide-react";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { Upload, FileText, Loader2, Search, X, BookOpen } from "lucide-react";
 import { createBook } from "@/lib/actions/book.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+
+interface OLResult {
+  key: string;
+  title: string;
+  author_name?: string[];
+  cover_i?: number;
+}
 
 export default function UploadForm() {
   const [dragging, setDragging] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const authorRef = useRef<HTMLInputElement>(null);
+  const coverUrlRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+
+  // Open Library search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<OLResult[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedCoverUrl, setSelectedCoverUrl] = useState("");
+  const searchRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Debounced Open Library search
+  const runSearch = useCallback(async (q: string) => {
+    if (!q.trim() || q.trim().length < 2) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    setSearching(true);
+    try {
+      const res = await fetch(
+        `https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=6&fields=key,title,author_name,cover_i`
+      );
+      const data = await res.json();
+      setSearchResults(data.docs ?? []);
+      setShowDropdown(true);
+    } catch {
+      // silently fail — catalog is optional
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchQuery(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => runSearch(val), 350);
+  };
+
+  const handleSelectResult = (result: OLResult) => {
+    const title = result.title ?? "";
+    const author = result.author_name?.[0] ?? "";
+    const coverUrl = result.cover_i
+      ? `https://covers.openlibrary.org/b/id/${result.cover_i}-L.jpg`
+      : "";
+
+    if (titleRef.current) titleRef.current.value = title;
+    if (authorRef.current) authorRef.current.value = author;
+    if (coverUrlRef.current) coverUrlRef.current.value = coverUrl;
+    setSelectedCoverUrl(coverUrl);
+    setSearchQuery(`${title}${author ? ` — ${author}` : ""}`);
+    setShowDropdown(false);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setShowDropdown(false);
+    setSelectedCoverUrl("");
+    if (titleRef.current) titleRef.current.value = "";
+    if (authorRef.current) authorRef.current.value = "";
+    if (coverUrlRef.current) coverUrlRef.current.value = "";
+  };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -39,6 +123,97 @@ export default function UploadForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Open Library catalog search */}
+      <div>
+        <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+          Search book catalog{" "}
+          <span className="text-stone-400 dark:text-stone-500 font-normal">(optional — auto-fills title & author)</span>
+        </label>
+        <div className="relative" ref={searchRef}>
+          <div className="relative flex items-center">
+            <Search className="absolute left-3 w-4 h-4 text-stone-400 dark:text-stone-500 pointer-events-none" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+              placeholder="Search by title or author…"
+              autoComplete="off"
+              className="w-full pl-9 pr-9 py-2.5 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg text-stone-900 dark:text-stone-50 placeholder-stone-400 focus:outline-none focus:border-amber-500 transition-colors text-sm"
+            />
+            {searching ? (
+              <Loader2 className="absolute right-3 w-4 h-4 text-stone-400 animate-spin" />
+            ) : searchQuery ? (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-3 w-4 h-4 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            ) : null}
+          </div>
+
+          {/* Dropdown results */}
+          {showDropdown && searchResults.length > 0 && (
+            <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg overflow-hidden">
+              {searchResults.map((result) => {
+                const coverThumb = result.cover_i
+                  ? `https://covers.openlibrary.org/b/id/${result.cover_i}-S.jpg`
+                  : null;
+                return (
+                  <button
+                    key={result.key}
+                    type="button"
+                    onClick={() => handleSelectResult(result)}
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 dark:hover:bg-stone-800 transition-colors text-left border-b border-stone-100 dark:border-stone-800 last:border-0"
+                  >
+                    <div className="w-8 h-11 rounded bg-stone-100 dark:bg-stone-800 shrink-0 overflow-hidden flex items-center justify-center">
+                      {coverThumb ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={coverThumb} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <BookOpen className="w-4 h-4 text-stone-400" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-stone-900 dark:text-stone-50 truncate">
+                        {result.title}
+                      </p>
+                      {result.author_name?.[0] && (
+                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                          {result.author_name[0]}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {showDropdown && searchResults.length === 0 && !searching && searchQuery.length >= 2 && (
+            <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg px-4 py-3 text-sm text-stone-500 dark:text-stone-400">
+              No results found — fill in the fields manually below.
+            </div>
+          )}
+        </div>
+
+        {/* Selected cover preview */}
+        {selectedCoverUrl && (
+          <div className="mt-3 flex items-center gap-3">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={selectedCoverUrl.replace("-L.jpg", "-M.jpg")}
+              alt="Selected cover"
+              className="h-16 w-11 object-cover rounded border border-stone-200 dark:border-stone-700"
+            />
+            <p className="text-xs text-stone-500 dark:text-stone-400">
+              Cover image selected from Open Library
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Drop zone */}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -77,6 +252,7 @@ export default function UploadForm() {
         <div>
           <label className="block text-sm text-stone-500 dark:text-stone-400 mb-1.5">Title</label>
           <input
+            ref={titleRef}
             name="title"
             required
             placeholder="Book title"
@@ -86,6 +262,7 @@ export default function UploadForm() {
         <div>
           <label className="block text-sm text-stone-500 dark:text-stone-400 mb-1.5">Author</label>
           <input
+            ref={authorRef}
             name="author"
             required
             placeholder="Author name"
@@ -93,6 +270,9 @@ export default function UploadForm() {
           />
         </div>
       </div>
+
+      {/* Hidden coverUrl field passed to server action */}
+      <input ref={coverUrlRef} type="hidden" name="coverUrl" value={selectedCoverUrl} />
 
       <button
         type="submit"

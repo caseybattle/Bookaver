@@ -51,8 +51,11 @@ export async function extractAndSegmentPDF(
 
   const chunks = chunkText(allText);
 
-  return chunks.map((content, chunkIndex) => ({
-    content,
-    chunkIndex,
-  }));
+  const words = allText.trim().split(/\s+/);
+  return chunks.map((content, chunkIndex) => {
+    const startWordIndex = chunkIndex * CHUNK_WORD_LIMIT;
+    const charOffset = words.slice(0, startWordIndex).join(" ").length;
+    const pb = pageBreaks.find((p) => p.afterChar >= charOffset);
+    return { content, chunkIndex, pageNumber: pb?.page };
+  });
 }

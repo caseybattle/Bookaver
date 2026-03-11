@@ -11,7 +11,8 @@ interface BookGridProps {
     title: string;
     author: string;
     coverUrl?: string;
-    pageCount?: number;
+    totalPages?: number;
+    totalSegments?: number;
     createdAt?: string;
   }>;
 }

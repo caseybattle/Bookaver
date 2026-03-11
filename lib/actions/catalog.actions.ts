@@ -1,6 +1,5 @@
 "use server";
 
-import { put } from "@vercel/blob";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import Book from "@/lib/db/models/Book";
 import Segment from "@/lib/db/models/Segment";
@@ -52,18 +51,9 @@ export async function addGutenbergBook(book: GutenbergBook) {
       ? words.slice(0, MAX_WORDS).join(" ")
       : cleanText;
 
-  // Upload text to Vercel Blob
+  // Use the original Gutenberg URL as blobUrl — text is already indexed in MongoDB Segments
   const author = getBookAuthor(book);
-  const safeName = book.title.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 60);
-  const blobPath = `books/gutenberg/${book.id}-${safeName}.txt`;
-  const blob = new Blob([cappedText], { type: "text/plain" });
-
-  const { url: blobUrl } = await put(blobPath, blob, {
-    access: "public",
-    contentType: "text/plain",
-    // Deduplicate: if this Gutenberg text already exists in Blob, reuse it
-    addRandomSuffix: false,
-  });
+  const blobUrl = textUrl;
 
   const coverUrl = getBookCoverUrl(book) ?? undefined;
 

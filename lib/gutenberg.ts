@@ -65,7 +65,8 @@ export async function searchGutenberg(
   const params = new URLSearchParams({
     search: query,
     page: String(page),
-    mime_type: "text/plain",
+    // No mime_type filter here — we filter client-side via getBookTextUrl()
+    // so searches return the full result set before narrowing
   });
   const res = await fetch(`${GUTENDEX_BASE}/books?${params}`, {
     next: { revalidate: 3600 }, // cache 1 hour
@@ -79,8 +80,8 @@ export async function getPopularGutenbergBooks(
   page = 1
 ): Promise<GutendexResponse> {
   const params = new URLSearchParams({
-    mime_type: "text/plain",
     page: String(page),
+    // No mime_type filter — client filters for readable text
   });
   const res = await fetch(`${GUTENDEX_BASE}/books?${params}`, {
     next: { revalidate: 3600 },

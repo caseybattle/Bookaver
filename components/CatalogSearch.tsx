@@ -20,7 +20,6 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
     setLoading(true);
     try {
       const params = new URLSearchParams({
-        mime_type: "text/plain",
         page: String(pg),
       });
       if (q.trim()) params.set("search", q.trim());

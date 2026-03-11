@@ -3,6 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getVapi } from "./client";
 import type Vapi from "@vapi-ai/web";
+import {
+  startVoiceSession,
+  endVoiceSession,
+} from "@/lib/actions/session.actions";
 
 export type CallStatus = "idle" | "connecting" | "active" | "ending";
 
@@ -21,6 +25,9 @@ export function useVapi(): UseVapiReturn {
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const vapiRef = useRef<InstanceType<typeof Vapi> | null>(null);
+  // Refs for DB session tracking — readable by the call-end event handler
+  const dbSessionIdRef = useRef<string | null>(null);
+  const vapiCallIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     try {
@@ -28,10 +35,25 @@ export function useVapi(): UseVapiReturn {
       vapiRef.current = vapi;
 
       const onCallStart = () => setCallStatus("active");
-      const onCallEnd = () => {
+
+      // Async handler: persist session end to DB when Vapi closes the call
+      const onCallEnd = async () => {
+        if (dbSessionIdRef.current) {
+          try {
+            await endVoiceSession(
+              dbSessionIdRef.current,
+              vapiCallIdRef.current ?? undefined
+            );
+          } catch {
+            // Don't block UI on billing errors — session data is best-effort
+          }
+          dbSessionIdRef.current = null;
+          vapiCallIdRef.current = null;
+        }
         setCallStatus("idle");
         setIsSpeaking(false);
       };
+
       const onSpeechStart = () => setIsSpeaking(true);
       const onSpeechEnd = () => setIsSpeaking(false);
       const onError = (err: Error) => {
@@ -61,18 +83,38 @@ export function useVapi(): UseVapiReturn {
     async (assistantId: string, bookId: string, personaId: string) => {
       setError(null);
       setCallStatus("connecting");
+
+      let dbSessionId: string | null = null;
       try {
+        // 1. Create the DB session record BEFORE starting the Vapi call
+        const { sessionId: sid } = await startVoiceSession(bookId, personaId);
+        dbSessionId = sid;
+        dbSessionIdRef.current = sid;
+
+        // 2. Start the Vapi call and capture the call object for its ID
         const vapi = vapiRef.current ?? getVapi();
-        // Start the Vapi call with metadata passed as overrides
-        await vapi.start(assistantId, {
+        const call = await vapi.start(assistantId, {
           variableValues: {
             bookId,
             personaId,
             searchEndpoint: `${window.location.origin}/api/vapi/search-book`,
           },
         });
-        setSessionId(crypto.randomUUID());
+
+        // 3. Store Vapi call ID so it gets saved when the call ends
+        vapiCallIdRef.current = (call as { id?: string } | null)?.id ?? null;
+
+        setSessionId(sid);
       } catch (err) {
+        // If DB session was created but Vapi failed, close the orphaned record
+        if (dbSessionId) {
+          try {
+            await endVoiceSession(dbSessionId);
+          } catch {
+            // silent
+          }
+          dbSessionIdRef.current = null;
+        }
         setError(err instanceof Error ? err.message : "Failed to start call");
         setCallStatus("idle");
       }

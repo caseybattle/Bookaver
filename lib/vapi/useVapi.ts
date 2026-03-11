@@ -14,7 +14,7 @@ export interface UseVapiReturn {
   callStatus: CallStatus;
   isSpeaking: boolean;
   error: string | null;
-  startCall: (assistantId: string, bookId: string, personaId: string) => Promise<void>;
+  startCall: (assistantId: string, bookId: string, personaId: string, bookTitle: string) => Promise<void>;
   stopCall: () => void;
   sessionId: string | null;
 }
@@ -80,7 +80,7 @@ export function useVapi(): UseVapiReturn {
   }, []);
 
   const startCall = useCallback(
-    async (assistantId: string, bookId: string, personaId: string) => {
+    async (assistantId: string, bookId: string, personaId: string, bookTitle: string) => {
       setError(null);
       setCallStatus("connecting");
 
@@ -97,6 +97,7 @@ export function useVapi(): UseVapiReturn {
           variableValues: {
             bookId,
             personaId,
+            bookTitle,
             searchEndpoint: `${window.location.origin}/api/vapi/search-book`,
           },
         });

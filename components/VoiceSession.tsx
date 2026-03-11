@@ -17,8 +17,8 @@ export default function VoiceSession({ bookId, bookTitle, assistantId }: VoiceSe
   const { callStatus, isSpeaking, error, startCall, stopCall } = useVapi();
 
   const handleStart = useCallback(async () => {
-    await startCall(assistantId, bookId, selectedPersonaId);
-  }, [assistantId, bookId, selectedPersonaId, startCall]);
+    await startCall(assistantId, bookId, selectedPersonaId, bookTitle);
+  }, [assistantId, bookId, selectedPersonaId, bookTitle, startCall]);
 
   return (
     <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 space-y-8">

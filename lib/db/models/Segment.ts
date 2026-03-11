@@ -6,6 +6,10 @@ export interface ISegment extends Document {
   content: string;
   chunkIndex: number;
   pageNumber?: number;
+  // Semantic embedding vector (1536-dim, OpenAI text-embedding-3-small).
+  // Present for books uploaded after the embeddings upgrade;
+  // absent for older books (those fall back to keyword/regex search).
+  embedding?: number[];
   createdAt: Date;
 }
 
@@ -16,11 +20,13 @@ const SegmentSchema = new Schema<ISegment>(
     content: { type: String, required: true },
     chunkIndex: { type: Number, required: true },
     pageNumber: { type: Number },
+    // Excluded from queries by default (use +embedding to select it explicitly)
+    embedding: { type: [Number], select: false },
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 );
 
-// Text index for keyword search (RAG fallback)
+// Text index for keyword search (fallback for books without embeddings)
 SegmentSchema.index({ content: 'text' });
 
 const Segment =

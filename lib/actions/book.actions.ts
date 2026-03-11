@@ -7,6 +7,7 @@ import Book, { IBook } from "@/lib/db/models/Book";
 import Segment from "@/lib/db/models/Segment";
 import { getClerkId } from "@/lib/clerk/billing";
 import { extractAndSegmentPDF } from "@/lib/pdf/parser";
+import { embedInBatches } from "@/lib/embeddings";
 
 async function fetchBookCover(title: string, author: string): Promise<string | null> {
   try {
@@ -65,16 +66,33 @@ export async function createBook(formData: FormData) {
     totalSegments: 0,
   });
 
-  // Extract and store segments
+  // Extract and segment PDF text
   const segments = await extractAndSegmentPDF(buffer);
 
+  // Generate semantic embeddings for all segments (batched, 20 at a time).
+  // If embedding fails (no API key, quota, etc.), we still save segments
+  // and fall back to keyword search at query time.
+  let embeddings: Array<number[] | null> = new Array(segments.length).fill(null);
+  try {
+    console.log(`[createBook] generating embeddings for ${segments.length} segments...`);
+    embeddings = await embedInBatches(
+      segments.map((s) => s.content),
+      20
+    );
+    console.log(`[createBook] embeddings generated successfully`);
+  } catch (embErr) {
+    console.warn("[createBook] embedding generation failed — storing segments without embeddings:", embErr);
+  }
+
+  // Store segments (with embeddings where available)
   await Segment.insertMany(
-    segments.map((seg) => ({
+    segments.map((seg, i) => ({
       bookId: book._id,
       clerkId,
       content: seg.content,
       chunkIndex: seg.chunkIndex,
       pageNumber: seg.pageNumber,
+      ...(embeddings[i] ? { embedding: embeddings[i] } : {}),
     }))
   );
 

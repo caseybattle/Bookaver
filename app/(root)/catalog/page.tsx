@@ -5,8 +5,8 @@ import CatalogSearch from "@/components/CatalogSearch";
 import { Library } from "lucide-react";
 
 export const metadata = {
-  title: "Book Catalog — Bookauver",
-  description: "Browse 70,000+ free public domain books from Project Gutenberg.",
+  title: "Book Catalog — Bookaver",
+  description: "Browse 70,000+ free public domain books from Project Gutenberg, or discover millions of titles from Google Books.",
 };
 
 export default async function CatalogPage() {
@@ -23,15 +23,16 @@ export default async function CatalogPage() {
         <div className="flex items-center gap-2 mb-3">
           <Library className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           <span className="text-amber-600 dark:text-amber-400 font-semibold text-sm uppercase tracking-wide">
-            Public Domain Catalog
+            Book Catalog
           </span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-stone-900 dark:text-stone-50 leading-tight mb-2">
-          70,000+ Free Books
+          Millions of Books to Explore
         </h1>
         <p className="text-stone-500 dark:text-stone-400 text-lg max-w-2xl">
-          Browse the complete Project Gutenberg library. Click any book to add it to
-          your library instantly — no PDF upload needed.
+          Browse 70,000+ free public domain classics from Project Gutenberg — add them
+          instantly. Or discover any title from Google Books and upload your own PDF copy
+          with metadata pre-filled.
         </p>
       </div>
 

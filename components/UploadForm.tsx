@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { Upload, FileText, Loader2, Search, X, BookOpen } from "lucide-react";
 import { createBook } from "@/lib/actions/book.actions";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface OLResult {
   key: string;
@@ -22,6 +22,7 @@ export default function UploadForm() {
   const authorRef = useRef<HTMLInputElement>(null);
   const coverUrlRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Open Library search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,6 +32,18 @@ export default function UploadForm() {
   const [selectedCoverUrl, setSelectedCoverUrl] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Pre-fill from URL params (e.g. coming from Google Books catalog)
+  useEffect(() => {
+    const title = searchParams.get("title") ?? "";
+    const author = searchParams.get("author") ?? "";
+    const cover = searchParams.get("cover") ?? "";
+    if (!title) return;
+    if (titleRef.current) titleRef.current.value = title;
+    if (authorRef.current) authorRef.current.value = author;
+    if (cover) setSelectedCoverUrl(cover);
+    setSearchQuery(`${title}${author ? ` — ${author}` : ""}`);
+  }, [searchParams]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -208,7 +221,7 @@ export default function UploadForm() {
               className="h-16 w-11 object-cover rounded border border-stone-200 dark:border-stone-700"
             />
             <p className="text-xs text-stone-500 dark:text-stone-400">
-              Cover image selected from Open Library
+              Cover image selected
             </p>
           </div>
         )}

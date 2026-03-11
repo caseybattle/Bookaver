@@ -5,7 +5,7 @@ import CatalogSearch from "@/components/CatalogSearch";
 import { Library } from "lucide-react";
 
 export const metadata = {
-  title: "Book Catalog — Bookaver",
+  title: "Book Catalog — Bookauver",
   description: "Browse 70,000+ free public domain books from Project Gutenberg.",
 };
 

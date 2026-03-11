@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bookaver – Talk to Your Books",
+  title: "Bookauver – Talk to Your Books",
   description: "Upload any book and have a real-time AI voice conversation with it.",
 };
 

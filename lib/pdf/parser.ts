@@ -1,20 +1,10 @@
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import { chunkText, CHUNK_WORD_LIMIT } from "./chunk";
 
 // Use legacy build with no worker (server-side safe)
 pdfjsLib.GlobalWorkerOptions.workerSrc = "";
 
-const CHUNK_WORD_LIMIT = 500;
-
-export function chunkText(text: string): string[] {
-  const words = text.trim().split(/\s+/);
-  const chunks: string[] = [];
-  for (let i = 0; i < words.length; i += CHUNK_WORD_LIMIT) {
-    const chunk = words.slice(i, i + CHUNK_WORD_LIMIT).join(" ");
-    if (chunk.trim()) chunks.push(chunk.trim());
-  }
-
-  return chunks;
-}
+export { chunkText };
 
 export interface ParsedSegment {
   content: string;

@@ -5,7 +5,7 @@ import { connectToDatabase } from "@/lib/db/mongoose";
 import Book from "@/lib/db/models/Book";
 import Segment from "@/lib/db/models/Segment";
 import { getClerkId } from "@/lib/clerk/billing";
-import { chunkText } from "@/lib/pdf/parser";
+import { chunkText } from "@/lib/pdf/chunk";
 import {
   GutenbergBook,
   getBookTextUrl,

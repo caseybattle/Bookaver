@@ -6,6 +6,7 @@ import BookGrid from "@/components/BookGrid";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
 import { Plus, Upload, Cpu, Mic, Library } from "lucide-react";
+import HeroIllustration from "@/components/HeroIllustration";
 
 interface HomeProps {
   searchParams: Promise<{ q?: string }>;
@@ -55,24 +56,9 @@ export default async function HomePage({ searchParams }: HomeProps) {
               </div>
             </div>
 
-            {/* Center — illustrated scene */}
-            <div className="hidden lg:flex items-end justify-center px-6 pt-6" style={{ minWidth: "220px" }}>
-              <div className="relative select-none" style={{ fontSize: "1px" }}>
-                {/* Desk lamp */}
-                <div className="absolute" style={{ right: "10px", top: "0px", fontSize: "52px", lineHeight: 1 }}>
-                  🪔
-                </div>
-                {/* Globe */}
-                <div className="absolute" style={{ left: "-20px", top: "30px", fontSize: "48px", lineHeight: 1 }}>
-                  🌍
-                </div>
-                {/* Stack of books */}
-                <div style={{ fontSize: "72px", lineHeight: 1, marginTop: "60px", display: "flex", gap: "4px", alignItems: "flex-end" }}>
-                  <span style={{ fontSize: "56px" }}>📚</span>
-                  <span style={{ fontSize: "64px" }}>📖</span>
-                  <span style={{ fontSize: "56px" }}>📕</span>
-                </div>
-              </div>
+            {/* Center — SVG illustration */}
+            <div className="hidden lg:flex items-center justify-center px-4 py-6" style={{ minWidth: "220px" }}>
+              <HeroIllustration className="w-full h-auto max-w-[230px]" />
             </div>
 
             {/* Right — numbered steps card */}

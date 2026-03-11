@@ -8,8 +8,8 @@ import ThemeToggle from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/", label: "Library" },
   { href: "/catalog", label: "Catalog" },
+  { href: "/", label: "Library" },
   { href: "/upload", label: "Upload" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/pricing", label: "Pricing" },

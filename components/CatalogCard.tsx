@@ -93,31 +93,11 @@ export default function CatalogCard({ book }: CatalogCardProps) {
       </div>
 
       {/* Info */}
-      <div className="p-3 flex flex-col gap-1.5 flex-1">
+      <div className="p-3 flex flex-col gap-1.5">
         <h3 className="font-semibold text-stone-900 dark:text-stone-50 text-sm leading-snug line-clamp-2">
           {book.title}
         </h3>
         <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{author}</p>
-
-        <button
-          onClick={handleAdd}
-          disabled={status !== "idle" || !hasText}
-          className="mt-auto w-full py-2 text-xs font-medium bg-stone-100 hover:bg-amber-100 dark:bg-stone-800 dark:hover:bg-amber-900/30 text-stone-700 dark:text-stone-300 hover:text-amber-700 dark:hover:text-amber-400 disabled:opacity-50 rounded-xl transition-colors flex items-center justify-center gap-1.5"
-        >
-          {status === "adding" ? (
-            <>
-              <Loader2 className="w-3 h-3 animate-spin" />
-              Processing…
-            </>
-          ) : !hasText ? (
-            "Not available"
-          ) : (
-            <>
-              <Plus className="w-3 h-3" />
-              Add to My Library
-            </>
-          )}
-        </button>
       </div>
     </div>
   );

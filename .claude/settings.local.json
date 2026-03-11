@@ -5,7 +5,8 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(where npm)",
       "Bash(npm run build)",
-      "Bash(npm install next-themes)"
+      "Bash(npm install next-themes)",
+      "Bash(git add .)"
     ]
   }
 }

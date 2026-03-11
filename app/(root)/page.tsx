@@ -5,7 +5,7 @@ import { getBooks } from "@/lib/actions/book.actions";
 import BookGrid from "@/components/BookGrid";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
-import { Plus, Upload, Cpu, Mic } from "lucide-react";
+import { Plus, Upload, Cpu, Mic, Library } from "lucide-react";
 
 interface HomeProps {
   searchParams: Promise<{ q?: string }>;
@@ -77,13 +77,22 @@ export default async function HomePage({ searchParams }: HomeProps) {
             ))}
           </div>
 
-          <Link
-            href="/upload"
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
-          >
-            <Plus className="w-4 h-4" />
-            Add new book
-          </Link>
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link
+              href="/upload"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-sm font-semibold transition-colors shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Upload a PDF
+            </Link>
+            <Link
+              href="/catalog"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-stone-900 border border-amber-200 dark:border-stone-700 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-stone-800 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+            >
+              <Library className="w-4 h-4" />
+              Browse Free Catalog
+            </Link>
+          </div>
         </div>
       )}
 

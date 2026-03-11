@@ -50,7 +50,7 @@ export async function createBook(formData: FormData) {
   const buffer = await file.arrayBuffer();
 
   const { url: blobUrl } = await put(blobPath, buffer, {
-    access: "public",
+    access: "private",
     contentType: "application/pdf",
   });
 

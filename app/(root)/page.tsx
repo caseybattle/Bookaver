@@ -5,8 +5,8 @@ import { getBooks } from "@/lib/actions/book.actions";
 import BookGrid from "@/components/BookGrid";
 import SearchBar from "@/components/SearchBar";
 import Link from "next/link";
+import Image from "next/image";
 import { Plus, Upload, Cpu, Mic, Library } from "lucide-react";
-import HeroIllustration from "@/components/HeroIllustration";
 
 interface HomeProps {
   searchParams: Promise<{ q?: string }>;
@@ -56,9 +56,16 @@ export default async function HomePage({ searchParams }: HomeProps) {
               </div>
             </div>
 
-            {/* Center — SVG illustration */}
-            <div className="hidden lg:flex items-center justify-center px-4 py-6" style={{ minWidth: "220px" }}>
-              <HeroIllustration className="w-full h-auto max-w-[230px]" />
+            {/* Center — AI illustration */}
+            <div className="hidden lg:flex items-center justify-center px-4 py-6" style={{ minWidth: "240px" }}>
+              <Image
+                src="/hero-illustration.png"
+                alt="Books, lamp, and globe illustration"
+                width={600}
+                height={335}
+                className="w-full h-auto max-w-[260px] rounded-xl"
+                priority
+              />
             </div>
 
             {/* Right — numbered steps card */}

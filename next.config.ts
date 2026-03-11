@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
       bodySizeLimit: "100mb",
     },
   },
+  // Explicitly opt in to Turbopack (default in Next 16) alongside
+  // the webpack config below (used for production/Edge runtime only).
+  turbopack: {},
   webpack: (config, { nextRuntime }) => {
     if (nextRuntime === "edge") {
       config.resolve.conditionNames = [
@@ -22,6 +25,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "*.vercel-storage.com" },
       { protocol: "https", hostname: "img.clerk.com" },
+      { protocol: "https", hostname: "covers.openlibrary.org" },
     ],
   },
 };

@@ -5,7 +5,7 @@ import { put, del } from "@vercel/blob";
 import { connectToDatabase } from "@/lib/db/mongoose";
 import Book, { IBook } from "@/lib/db/models/Book";
 import Segment from "@/lib/db/models/Segment";
-import { getClerkId } from "@/lib/clerk/billing";
+import { getClerkId, getUserPlan, getPlanLimits } from "@/lib/clerk/billing";
 import { extractAndSegmentPDF } from "@/lib/pdf/parser";
 import { embedInBatches } from "@/lib/embeddings";
 
@@ -42,6 +42,16 @@ export async function createBook(formData: FormData) {
   }
 
   await connectToDatabase();
+
+  // Enforce book limit before doing any work
+  const plan = await getUserPlan();
+  const limits = getPlanLimits(plan);
+  const currentBookCount = await Book.countDocuments({ clerkId });
+  if (limits.books !== Infinity && currentBookCount >= limits.books) {
+    throw new Error(
+      `Book limit reached. Your ${plan} plan allows ${limits.books} book${limits.books === 1 ? "" : "s"}. Upgrade to add more.`
+    );
+  }
 
   // Use pre-filled cover from catalog search; fall back to OpenLibrary fetch
   const coverUrl = prefilledCoverUrl || await fetchBookCover(title, author);

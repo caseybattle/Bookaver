@@ -2,7 +2,7 @@
 
 import { connectToDatabase } from "@/lib/db/mongoose";
 import VoiceSession from "@/lib/db/models/VoiceSession";
-import { getClerkId } from "@/lib/clerk/billing";
+import { getClerkId, getUserPlan, getPlanLimits } from "@/lib/clerk/billing";
 
 function getBillingMonth(): string {
   const now = new Date();
@@ -14,6 +14,19 @@ function getBillingMonth(): string {
 export async function startVoiceSession(bookId: string, personaId: string) {
   const clerkId = await getClerkId();
   await connectToDatabase();
+
+  // Enforce monthly session limit before creating the session
+  const plan = await getUserPlan();
+  const limits = getPlanLimits(plan);
+  if (limits.sessionsPerMonth !== Infinity) {
+    const billingMonth = getBillingMonth();
+    const sessionCount = await VoiceSession.countDocuments({ clerkId, billingMonth });
+    if (sessionCount >= limits.sessionsPerMonth) {
+      throw new Error(
+        `Monthly session limit reached. Your ${plan} plan allows ${limits.sessionsPerMonth} session${limits.sessionsPerMonth === 1 ? "" : "s"}/month. Upgrade for more.`
+      );
+    }
+  }
 
   const session = await VoiceSession.create({
     bookId,

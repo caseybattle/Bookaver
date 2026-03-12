@@ -2,10 +2,16 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 
 export type PlanType = "free" | "pro" | "unlimited";
 
-export const PLAN_LIMITS: Record<PlanType, { books: number; minutesPerMonth: number }> = {
-  free: { books: 2, minutesPerMonth: 30 },
-  pro: { books: 20, minutesPerMonth: 300 },
-  unlimited: { books: Infinity, minutesPerMonth: Infinity },
+export interface PlanLimits {
+  books: number;
+  sessionsPerMonth: number;
+  minutesPerMonth: number;
+}
+
+export const PLAN_LIMITS: Record<PlanType, PlanLimits> = {
+  free:      { books: 2,        sessionsPerMonth: 5,        minutesPerMonth: 30 },
+  pro:       { books: 20,       sessionsPerMonth: 100,      minutesPerMonth: 300 },
+  unlimited: { books: Infinity, sessionsPerMonth: Infinity, minutesPerMonth: Infinity },
 };
 
 export async function getUserPlan(): Promise<PlanType> {
@@ -17,7 +23,7 @@ export async function getUserPlan(): Promise<PlanType> {
   return plan ?? "free";
 }
 
-export function getPlanLimits(plan: PlanType): { books: number; minutesPerMonth: number } {
+export function getPlanLimits(plan: PlanType): PlanLimits {
   return PLAN_LIMITS[plan];
 }
 

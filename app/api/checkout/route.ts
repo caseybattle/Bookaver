@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 // Map Stripe price IDs → Bookaver plan names
-export const PRICE_TO_PLAN: Record<string, string> = {
+const PRICE_TO_PLAN: Record<string, string> = {
   price_1TA9g1K4xeqJrm9xl5glOCWp: "pro",       // $9.99/mo
   price_1TA9g2K4xeqJrm9xyohAwGlB: "unlimited",  // $19.99/mo
 };

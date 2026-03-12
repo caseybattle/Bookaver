@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Search, Loader2, ChevronLeft, ChevronRight, X } from "lucide-react";
 import CatalogCard from "@/components/CatalogCard";
 import IACatalogCard from "@/components/IACatalogCard";
@@ -8,7 +8,7 @@ import { GutenbergBook, GutendexResponse } from "@/lib/gutenberg";
 import { IABook, IASearchResponse } from "@/lib/internet-archive";
 
 interface CatalogSearchProps {
-  initialData: GutendexResponse;
+  initialData?: GutendexResponse | null;
 }
 
 // Discriminated union for unified display
@@ -44,15 +44,23 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
   const [loading, setLoading] = useState(false);
 
   // For default (no search) state — Gutenberg popular books with pagination
-  const [defaultData, setDefaultData] = useState<GutendexResponse>(initialData);
+  const [defaultData, setDefaultData] = useState<GutendexResponse | null>(initialData ?? null);
   const [defaultPage, setDefaultPage] = useState(1);
-  const [defaultLoading, setDefaultLoading] = useState(false);
+  const [defaultLoading, setDefaultLoading] = useState(!initialData);
 
   // For search results — unified merged list
   const [searchResults, setSearchResults] = useState<UnifiedBook[] | null>(null);
   const [searchTotal, setSearchTotal] = useState(0);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Client-side initial load — runs immediately on mount so the page shell renders first
+  useEffect(() => {
+    if (!initialData) {
+      loadDefaultPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const runSearch = useCallback(async (q: string) => {
     if (!q.trim()) {
@@ -127,7 +135,7 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
   const showLoading = loading || (!isSearching && defaultLoading);
 
   // Build display list for default view
-  const defaultBooks = defaultData.results.filter(hasGutenbergText);
+  const defaultBooks = (defaultData?.results ?? []).filter(hasGutenbergText);
 
   return (
     <div className="space-y-6">
@@ -139,7 +147,7 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
           value={query}
           onChange={handleQueryChange}
           placeholder="Search 2 million+ books\u2026"
-          className="w-full pl-10 pr-10 py-3 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-stone-50 placeholder-stone-400 focus:outline-none focus:border-amber-500 transition-colors text-sm shadow-sm"
+          className="w-full pl-10 pr-10 py-3 bg-white dark:bg-[#241c16] border border-stone-200 dark:border-[#52402c] rounded-xl text-stone-900 dark:text-stone-50 placeholder-stone-400 focus:outline-none focus:border-amber-500 transition-colors text-sm shadow-sm"
         />
         {loading ? (
           <Loader2 className="absolute right-3.5 w-4 h-4 text-stone-400 animate-spin" />
@@ -164,7 +172,7 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
       )}
       {!isSearching && (
         <p className="text-sm text-stone-500 dark:text-stone-400">
-          {defaultData.count > 0 ? `${defaultData.count.toLocaleString()} books available` : ""}
+          {(defaultData?.count ?? 0) > 0 ? `${defaultData!.count.toLocaleString()} books available` : ""}
         </p>
       )}
 
@@ -174,7 +182,7 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
           {Array.from({ length: 12 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-2xl bg-stone-100 dark:bg-stone-800 animate-pulse aspect-[2/3]"
+              className="rounded-2xl bg-stone-100 dark:bg-[#3c2e20] animate-pulse aspect-[2/3]"
             />
           ))}
         </div>
@@ -208,12 +216,12 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
       )}
 
       {/* Pagination — only shown in default (no-query) view */}
-      {!isSearching && (defaultData.previous || defaultData.next) && (
+      {!isSearching && (defaultData?.previous || defaultData?.next) && (
         <div className="flex items-center justify-center gap-4 pt-2">
           <button
             onClick={() => loadDefaultPage(defaultPage - 1)}
-            disabled={!defaultData.previous || defaultLoading}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 disabled:opacity-40 rounded-xl transition-colors"
+            disabled={!defaultData?.previous || defaultLoading}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-stone-100 hover:bg-stone-200 dark:bg-[#3c2e20] dark:hover:bg-[#52402c] text-stone-700 dark:text-stone-300 disabled:opacity-40 rounded-xl transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             Previous
@@ -221,8 +229,8 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
           <span className="text-sm text-stone-500 dark:text-stone-400">Page {defaultPage}</span>
           <button
             onClick={() => loadDefaultPage(defaultPage + 1)}
-            disabled={!defaultData.next || defaultLoading}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-300 disabled:opacity-40 rounded-xl transition-colors"
+            disabled={!defaultData?.next || defaultLoading}
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-stone-100 hover:bg-stone-200 dark:bg-[#3c2e20] dark:hover:bg-[#52402c] text-stone-700 dark:text-stone-300 disabled:opacity-40 rounded-xl transition-colors"
           >
             Next
             <ChevronRight className="w-4 h-4" />

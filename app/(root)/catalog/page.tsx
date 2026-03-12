@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
-import { getPopularGutenbergBooks } from "@/lib/gutenberg";
 import CatalogSearch from "@/components/CatalogSearch";
 import { Library } from "lucide-react";
 
@@ -12,9 +11,6 @@ export const metadata = {
 export default async function CatalogPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
-
-  // Server-side fetch for instant first paint; CatalogSearch handles client-side searches
-  const initialData = await getPopularGutenbergBooks(1);
 
   return (
     <div className="space-y-8">
@@ -34,8 +30,8 @@ export default async function CatalogPage() {
         </p>
       </div>
 
-      {/* Search input + results grid + pagination */}
-      <CatalogSearch initialData={initialData} />
+      {/* Search input + results grid + pagination — fetches client-side for instant page load */}
+      <CatalogSearch />
     </div>
   );
 }

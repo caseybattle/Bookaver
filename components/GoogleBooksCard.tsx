@@ -20,8 +20,13 @@ export default function GoogleBooksCard({ book }: GoogleBooksCardProps) {
   if (author && author !== "Unknown Author") uploadParams.set("author", author);
   if (coverUrl) uploadParams.set("cover", coverUrl);
 
+  const uploadUrl = `/upload?${uploadParams.toString()}`;
+
   return (
-    <div className="group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden flex flex-col hover:border-amber-400/60 dark:hover:border-amber-600/60 hover:shadow-md transition-all duration-200">
+    <Link
+      href={uploadUrl}
+      className="group bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden flex flex-col hover:border-amber-400/60 dark:hover:border-amber-600/60 hover:shadow-md transition-all duration-200 cursor-pointer"
+    >
       {/* Cover */}
       <div className="relative w-full aspect-[2/3] bg-gradient-to-br from-amber-50 to-stone-100 dark:from-stone-800 dark:to-stone-900 overflow-hidden flex items-center justify-center">
         {coverUrl ? (
@@ -45,15 +50,12 @@ export default function GoogleBooksCard({ book }: GoogleBooksCardProps) {
           </div>
         )}
 
-        {/* Hover overlay — link to upload with pre-filled metadata */}
+        {/* Hover overlay — visual polish */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-end p-4">
-          <Link
-            href={`/upload?${uploadParams.toString()}`}
-            className="w-full py-2 bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
-          >
+          <span className="w-full py-2 bg-amber-500 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-2">
             <Upload className="w-3.5 h-3.5" />
             Upload PDF
-          </Link>
+          </span>
         </div>
       </div>
 
@@ -64,6 +66,13 @@ export default function GoogleBooksCard({ book }: GoogleBooksCardProps) {
         </h3>
         <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{author}</p>
       </div>
-    </div>
+
+      {/* Persistent bottom badge — always visible, no hover required */}
+      <div className="mt-auto px-3 pb-3">
+        <div className="w-full text-center text-xs font-medium py-1 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">
+          Upload PDF →
+        </div>
+      </div>
+    </Link>
   );
 }

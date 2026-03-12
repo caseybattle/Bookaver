@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
-import { Upload, FileText, Loader2, Search, X, BookOpen } from "lucide-react";
+import { Upload, FileText, Loader2, Search, X, BookOpen, Check } from "lucide-react";
 import { createBook } from "@/lib/actions/book.actions";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,6 +34,10 @@ export default function UploadForm() {
   const searchRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Pre-filled state: true when arriving from Google Books catalog
+  const [isPreFilled, setIsPreFilled] = useState(false);
+  const [preFilledTitle, setPreFilledTitle] = useState("");
+
   // Pre-fill from URL params (e.g. coming from Google Books catalog)
   useEffect(() => {
     const title = searchParams.get("title") ?? "";
@@ -44,6 +48,8 @@ export default function UploadForm() {
     if (authorRef.current) authorRef.current.value = author;
     if (cover) setSelectedCoverUrl(cover);
     setSearchQuery(`${title}${author ? ` — ${author}` : ""}`);
+    setIsPreFilled(true);
+    setPreFilledTitle(title);
   }, [searchParams]);
 
   // Close dropdown on outside click
@@ -111,6 +117,12 @@ export default function UploadForm() {
     if (coverUrlRef.current) coverUrlRef.current.value = "";
   };
 
+  // Switch from pre-filled mode back to manual search
+  const handleSearchDifferent = () => {
+    setIsPreFilled(false);
+    clearSearch();
+  };
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragging(false);
@@ -137,98 +149,128 @@ export default function UploadForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Open Library catalog search */}
+      {/* Open Library catalog search — collapses when pre-filled from catalog */}
       <div>
-        <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
-          Search book catalog{" "}
-          <span className="text-stone-400 dark:text-stone-500 font-normal">(optional — auto-fills title & author)</span>
-        </label>
-        <div className="relative" ref={searchRef}>
-          <div className="relative flex items-center">
-            <Search className="absolute left-3 w-4 h-4 text-stone-400 dark:text-stone-500 pointer-events-none" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
-              placeholder="Search by title or author…"
-              autoComplete="off"
-              className="w-full pl-9 pr-9 py-2.5 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg text-stone-900 dark:text-stone-50 placeholder-stone-400 focus:outline-none focus:border-amber-500 transition-colors text-sm"
-            />
-            {searching ? (
-              <Loader2 className="absolute right-3 w-4 h-4 text-stone-400 animate-spin" />
-            ) : searchQuery ? (
-              <button
-                type="button"
-                onClick={clearSearch}
-                className="absolute right-3 w-4 h-4 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            ) : null}
+        {isPreFilled ? (
+          /* Collapsed "book already selected" state */
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">
+              Book catalog
+            </label>
+            <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
+              <Check className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span className="text-sm text-stone-800 dark:text-stone-200 truncate font-medium">
+                {preFilledTitle} — pre-filled from catalog
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleSearchDifferent}
+              className="text-xs text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors underline underline-offset-2"
+            >
+              Search a different book →
+            </button>
           </div>
-
-          {/* Dropdown results */}
-          {showDropdown && searchResults.length > 0 && (
-            <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg overflow-hidden">
-              {searchResults.map((result) => {
-                const coverThumb = result.cover_i
-                  ? `https://covers.openlibrary.org/b/id/${result.cover_i}-S.jpg`
-                  : null;
-                return (
+        ) : (
+          /* Normal search state */
+          <>
+            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-1.5">
+              Search book catalog{" "}
+              <span className="text-stone-400 dark:text-stone-500 font-normal">(optional — auto-fills title & author)</span>
+            </label>
+            <div className="relative" ref={searchRef}>
+              <div className="relative flex items-center">
+                <Search className="absolute left-3 w-4 h-4 text-stone-400 dark:text-stone-500 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+                  placeholder="Search by title or author…"
+                  autoComplete="off"
+                  className="w-full pl-9 pr-9 py-2.5 bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-lg text-stone-900 dark:text-stone-50 placeholder-stone-400 focus:outline-none focus:border-amber-500 transition-colors text-sm"
+                />
+                {searching ? (
+                  <Loader2 className="absolute right-3 w-4 h-4 text-stone-400 animate-spin" />
+                ) : searchQuery ? (
                   <button
-                    key={result.key}
                     type="button"
-                    onClick={() => handleSelectResult(result)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 dark:hover:bg-stone-800 transition-colors text-left border-b border-stone-100 dark:border-stone-800 last:border-0"
+                    onClick={clearSearch}
+                    className="absolute right-3 w-4 h-4 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
                   >
-                    <div className="w-8 h-11 rounded bg-stone-100 dark:bg-stone-800 shrink-0 overflow-hidden flex items-center justify-center">
-                      {coverThumb ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={coverThumb} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <BookOpen className="w-4 h-4 text-stone-400" />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-stone-900 dark:text-stone-50 truncate">
-                        {sanitizeMarcTitle(result.title)}
-                      </p>
-                      {result.author_name?.[0] && (
-                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
-                          {result.author_name[0]}
-                        </p>
-                      )}
-                    </div>
+                    <X className="w-4 h-4" />
                   </button>
-                );
-              })}
-            </div>
-          )}
-          {showDropdown && searchResults.length === 0 && !searching && searchQuery.length >= 2 && (
-            <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg px-4 py-3 text-sm text-stone-500 dark:text-stone-400">
-              No results found — fill in the fields manually below.
-            </div>
-          )}
-        </div>
+                ) : null}
+              </div>
 
-        {/* Selected cover preview */}
-        {selectedCoverUrl && (
-          <div className="mt-3 flex items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={selectedCoverUrl.replace("-L.jpg", "-M.jpg")}
-              alt="Selected cover"
-              className="h-16 w-11 object-cover rounded border border-stone-200 dark:border-stone-700"
-            />
-            <p className="text-xs text-stone-500 dark:text-stone-400">
-              Cover image selected
-            </p>
-          </div>
+              {/* Dropdown results */}
+              {showDropdown && searchResults.length > 0 && (
+                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg overflow-hidden">
+                  {searchResults.map((result) => {
+                    const coverThumb = result.cover_i
+                      ? `https://covers.openlibrary.org/b/id/${result.cover_i}-S.jpg`
+                      : null;
+                    return (
+                      <button
+                        key={result.key}
+                        type="button"
+                        onClick={() => handleSelectResult(result)}
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-amber-50 dark:hover:bg-stone-800 transition-colors text-left border-b border-stone-100 dark:border-stone-800 last:border-0"
+                      >
+                        <div className="w-8 h-11 rounded bg-stone-100 dark:bg-stone-800 shrink-0 overflow-hidden flex items-center justify-center">
+                          {coverThumb ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={coverThumb} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <BookOpen className="w-4 h-4 text-stone-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-stone-900 dark:text-stone-50 truncate">
+                            {sanitizeMarcTitle(result.title)}
+                          </p>
+                          {result.author_name?.[0] && (
+                            <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                              {result.author_name[0]}
+                            </p>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+              {showDropdown && searchResults.length === 0 && !searching && searchQuery.length >= 2 && (
+                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl shadow-lg px-4 py-3 text-sm text-stone-500 dark:text-stone-400">
+                  No results found — fill in the fields manually below.
+                </div>
+              )}
+            </div>
+
+            {/* Selected cover preview */}
+            {selectedCoverUrl && (
+              <div className="mt-3 flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={selectedCoverUrl.replace("-L.jpg", "-M.jpg")}
+                  alt="Selected cover"
+                  className="h-16 w-11 object-cover rounded border border-stone-200 dark:border-stone-700"
+                />
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  Cover image selected
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* Drop zone */}
+      {/* Drop zone — primary focus when pre-filled */}
+      {isPreFilled && (
+        <p className="text-sm font-medium text-stone-700 dark:text-stone-300 -mb-2">
+          Now upload your PDF copy:
+        </p>
+      )}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}

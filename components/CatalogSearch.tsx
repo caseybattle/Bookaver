@@ -240,15 +240,38 @@ export default function CatalogSearch({ initialData }: CatalogSearchProps) {
       {/* ── Google Books tab ────────────────────────────────────────── */}
       {source === "google" && (
         <div className="space-y-6">
-          {/* Hint banner */}
-          <div className="flex items-start gap-3 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 rounded-xl text-sm text-amber-800 dark:text-amber-300">
-            <BookOpen className="w-4 h-4 mt-0.5 shrink-0" />
-            <p>
-              Search millions of titles from Google Books. When you find the book you want,
-              click{" "}
-              <strong>Upload PDF</strong> to add your own PDF copy with the title, author, and
-              cover pre-filled.
-            </p>
+          {/* How it works banner */}
+          <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 rounded-xl overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-amber-200/60 dark:border-amber-800/40">
+              <p className="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                How the catalog works
+              </p>
+            </div>
+            <div className="grid sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-amber-200/60 dark:divide-amber-800/40">
+              <div className="flex items-start gap-3 p-4">
+                <span className="text-lg leading-none mt-0.5">🔖</span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-200 mb-0.5">
+                    Free Books (Project Gutenberg)
+                  </p>
+                  <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                    Click any card — the book is instantly added to your library. No upload needed.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-4">
+                <span className="text-lg leading-none mt-0.5">📚</span>
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-200 mb-0.5">
+                    Discover More (Google Books)
+                  </p>
+                  <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                    Browse millions of titles. Click any card to go to the upload page with title,
+                    author, and cover pre-filled — just add your PDF.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Search input */}

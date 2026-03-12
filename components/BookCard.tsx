@@ -12,9 +12,9 @@ interface BookCardProps {
 
 export default function BookCard({ book, onDelete }: BookCardProps) {
   return (
-    <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden flex flex-col hover:border-amber-400/60 dark:hover:border-amber-600/60 transition-colors shadow-sm">
+    <div className="bg-stone-50 dark:bg-[#3c2e20] border border-stone-200 dark:border-[#52402c] rounded-2xl overflow-hidden flex flex-col hover:border-amber-400/60 dark:hover:border-amber-600/60 transition-colors shadow-sm">
       {/* Cover image area */}
-      <div className="relative w-full h-48 bg-gradient-to-br from-amber-50 to-stone-100 dark:from-stone-800 dark:to-[#0f0e0d] flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-48 bg-gradient-to-br from-amber-50 to-stone-100 dark:from-[#4a3828] dark:to-[#2e2418] flex items-center justify-center overflow-hidden">
         {book.coverUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

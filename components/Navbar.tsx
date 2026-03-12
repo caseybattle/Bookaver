@@ -24,7 +24,7 @@ export default function Navbar() {
     href === "/" ? pathname === "/" : pathname.startsWith(href);
 
   return (
-    <nav className="border-b border-stone-200 dark:border-stone-800 bg-stone-50/80 dark:bg-[#0f0e0d]/80 backdrop-blur sticky top-0 z-50">
+    <nav className="border-b border-stone-200 dark:border-stone-800 bg-stone-50/80 dark:bg-[#2e2418]/80 backdrop-blur sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 font-bold text-xl text-stone-900 dark:text-stone-50">
@@ -85,7 +85,7 @@ export default function Navbar() {
 
       {/* Mobile dropdown */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#0f0e0d] px-4 py-3 flex flex-col gap-1">
+        <div className="md:hidden border-t border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-[#2e2418] px-4 py-3 flex flex-col gap-1">
           {navLinks.map(({ href, label }) => (
             <Link
               key={href}

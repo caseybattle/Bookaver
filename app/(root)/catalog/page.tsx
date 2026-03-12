@@ -6,7 +6,7 @@ import { Library } from "lucide-react";
 
 export const metadata = {
   title: "Book Catalog — Bookaver",
-  description: "Browse 70,000+ free public domain books from Project Gutenberg, or discover millions of titles from Google Books.",
+  description: "Search 2 million+ free public domain books. Add them instantly to your library and start AI voice conversations.",
 };
 
 export default async function CatalogPage() {
@@ -30,9 +30,7 @@ export default async function CatalogPage() {
           Millions of Books to Explore
         </h1>
         <p className="text-stone-500 dark:text-stone-400 text-lg max-w-2xl">
-          Browse 70,000+ free public domain classics from Project Gutenberg — add them
-          instantly. Or discover any title from Google Books and upload your own PDF copy
-          with metadata pre-filled.
+          Search millions of free books — add them instantly to your library with a single click.
         </p>
       </div>
 

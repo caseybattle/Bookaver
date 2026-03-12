@@ -12,6 +12,7 @@ import {
   getBookAuthor,
   stripGutenbergBoilerplate,
 } from "@/lib/gutenberg";
+import { getIATextUrl } from "@/lib/internet-archive";
 import { embedInBatches } from "@/lib/embeddings";
 import { revalidatePath } from "next/cache";
 
@@ -123,6 +124,122 @@ export async function addGutenbergBook(book: GutenbergBook) {
 
       console.log(
         `[catalog] embeddings stored for bookId=${bookDoc._id} (${writes.length}/${texts.length} segments)`
+      );
+    } catch (e) {
+      console.error("[catalog] embedding failed for bookId=" + bookDoc._id + ":", e);
+    }
+  })();
+  // ────────────────────────────────────────────────────────────────────────
+
+  revalidatePath("/");
+  return { success: true, bookId: bookDoc._id.toString(), alreadyExists: false };
+}
+
+export async function addInternetArchiveBook({
+  identifier,
+  title,
+  author,
+  coverUrl,
+}: {
+  identifier: string;
+  title: string;
+  author: string;
+  coverUrl?: string;
+}) {
+  const clerkId = await getClerkId();
+  await connectToDatabase();
+
+  // ── Billing enforcement ──────────────────────────────────────────────────
+  const plan = await getUserPlan();
+  const limits = getPlanLimits(plan);
+  const currentBookCount = await Book.countDocuments({ clerkId });
+  if (limits.books !== Infinity && currentBookCount >= limits.books) {
+    throw new Error(
+      `Book limit reached. Your ${plan} plan allows ${limits.books} book${limits.books === 1 ? "" : "s"}. Upgrade to add more.`
+    );
+  }
+  // ────────────────────────────────────────────────────────────────────────
+
+  // Check if user already has this book
+  const existing = await Book.findOne({ clerkId, title, author }).lean();
+  if (existing) {
+    return {
+      success: true,
+      bookId: (existing as { _id: { toString(): string } })._id.toString(),
+      alreadyExists: true,
+    };
+  }
+
+  const textUrl = await getIATextUrl(identifier);
+  if (!textUrl) {
+    throw new Error("No plain-text version available for this book.");
+  }
+
+  // Download the book text from Internet Archive
+  const textRes = await fetch(textUrl, {
+    headers: { "User-Agent": "Bookaver/1.0 (https://bookaver.vercel.app)" },
+  });
+  if (!textRes.ok) {
+    throw new Error(`Failed to download book text: ${textRes.status}`);
+  }
+  const rawText = await textRes.text();
+
+  // Cap length to avoid timeout
+  const words = rawText.trim().split(/\s+/);
+  const cappedText =
+    words.length > MAX_WORDS ? words.slice(0, MAX_WORDS).join(" ") : rawText;
+
+  // Create Book record — use the IA download URL as blobUrl
+  const bookDoc = await Book.create({
+    clerkId,
+    title,
+    author,
+    blobUrl: textUrl,
+    ...(coverUrl ? { coverUrl } : {}),
+    totalPages: 0,
+    totalSegments: 0,
+  });
+
+  // Segment the text
+  const chunks = chunkText(cappedText);
+
+  const segmentDocs = chunks.map((content, chunkIndex) => ({
+    bookId: bookDoc._id,
+    clerkId,
+    content,
+    chunkIndex,
+  }));
+
+  await Segment.insertMany(segmentDocs);
+
+  // Update totalSegments
+  await Book.findByIdAndUpdate(bookDoc._id, {
+    totalSegments: chunks.length,
+  });
+
+  // ── Fire-and-forget: generate embeddings in the background ───────────────
+  (async () => {
+    try {
+      const embeddings = await embedInBatches(chunks);
+
+      const writes = embeddings
+        .map((embedding, i) => {
+          if (!embedding) return null;
+          return {
+            updateOne: {
+              filter: { bookId: bookDoc._id, chunkIndex: i },
+              update: { $set: { embedding } },
+            },
+          };
+        })
+        .filter((op): op is NonNullable<typeof op> => op !== null);
+
+      if (writes.length > 0) {
+        await Segment.bulkWrite(writes);
+      }
+
+      console.log(
+        `[catalog] embeddings stored for bookId=${bookDoc._id} (${writes.length}/${chunks.length} segments)`
       );
     } catch (e) {
       console.error("[catalog] embedding failed for bookId=" + bookDoc._id + ":", e);

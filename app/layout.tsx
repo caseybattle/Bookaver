@@ -20,7 +20,7 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/"
     >
       <html lang="en" suppressHydrationWarning>
-        <body className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-50 antialiased">
+        <body className="min-h-screen bg-white dark:text-gray-50 antialiased" style={{ background: 'var(--background)', color: 'var(--foreground)' }}>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
             <Toaster richColors position="top-right" />

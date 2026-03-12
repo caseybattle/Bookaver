@@ -14,12 +14,12 @@
 }
 
 .dark {
-  /* Dark mode — deep warm charcoal */
-  --background: #0f0e0d;
-  --foreground: #fafaf9;
-  --card: #1c1917;
-  --card-border: #292524;
-  --muted: #a8a29e;
+  /* Dark mode — dark espresso / warm mahogany */
+  --background: #1a1410;
+  --foreground: #f5f0eb;
+  --card: #241c16;
+  --card-border: #342a20;
+  --muted: #a89b92;
   --accent: #f59e0b;
 }
 

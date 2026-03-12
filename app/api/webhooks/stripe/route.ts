@@ -7,8 +7,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 // Map Stripe price IDs → plan names (keep in sync with checkout route)
 const PRICE_TO_PLAN: Record<string, string> = {
-  price_1TA9g1K4xeqJrm9xl5glOCWp: "pro",
-  price_1TA9g2K4xeqJrm9xyohAwGlB: "unlimited",
+  price_1TAAqzJ3NNd66KKSfhUujDnB: "pro",
+  price_1TAAqzJ3NNd66KKS2v5tt4So: "unlimited",
 };
 
 async function updateClerkPlan(clerkId: string, plan: string) {

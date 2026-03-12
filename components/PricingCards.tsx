@@ -6,8 +6,8 @@ import { Check, Zap, Infinity, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { PlanType } from "@/lib/clerk/billing";
 
-const PRO_PRICE_ID = "price_1TA9g1K4xeqJrm9xl5glOCWp";
-const UNLIMITED_PRICE_ID = "price_1TA9g2K4xeqJrm9xyohAwGlB";
+const PRO_PRICE_ID = "price_1TAAqzJ3NNd66KKSfhUujDnB";
+const UNLIMITED_PRICE_ID = "price_1TAAqzJ3NNd66KKS2v5tt4So";
 
 interface Plan {
   id: PlanType;

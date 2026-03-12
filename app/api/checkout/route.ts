@@ -4,8 +4,8 @@ import Stripe from "stripe";
 
 // Map Stripe price IDs → Bookaver plan names
 const PRICE_TO_PLAN: Record<string, string> = {
-  price_1TA9g1K4xeqJrm9xl5glOCWp: "pro",       // $9.99/mo
-  price_1TA9g2K4xeqJrm9xyohAwGlB: "unlimited",  // $19.99/mo
+  price_1TAAqzJ3NNd66KKSfhUujDnB: "pro",       // $9.99/mo
+  price_1TAAqzJ3NNd66KKS2v5tt4So: "unlimited",  // $19.99/mo
 };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {

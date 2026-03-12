@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
           .sort((a, b) => b.score - a.score)
           .slice(0, 5);
 
-        segments = scored.map((s) => s.seg as SegmentLike);
+        segments = scored.map((s) => s.seg as unknown as SegmentLike);
 
         console.log(
           `[search-book] vector search: ${segments.length} results, top score=${scored[0]?.score.toFixed(3)}`

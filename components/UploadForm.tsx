@@ -5,6 +5,7 @@ import { Upload, FileText, Loader2, Search, X, BookOpen } from "lucide-react";
 import { createBook } from "@/lib/actions/book.actions";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
+import { sanitizeMarcTitle } from "@/lib/utils";
 
 interface OLResult {
   key: string;
@@ -84,16 +85,6 @@ export default function UploadForm() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => runSearch(val), 350);
   };
-
-  // Strip MARC subfield codes returned by the OpenLibrary API.
-  // e.g. "Religion and the rise of capitalism : $b A historical study" → "Religion and the rise of capitalism: A historical study"
-  const sanitizeMarcTitle = (raw: string) =>
-    raw
-      .replace(/\s*:\s*\$[a-zA-Z]\s*/g, ": ")  // ": $b " → ": "
-      .replace(/\s*\/\s*\$[a-zA-Z]\s*/g, " ")   // "/ $c " → " "
-      .replace(/\s*\$[a-zA-Z]\s*/g, " ")         // any remaining "$x" → " "
-      .replace(/\s{2,}/g, " ")                    // collapse extra spaces
-      .trim();
 
   const handleSelectResult = (result: OLResult) => {
     const title = sanitizeMarcTitle(result.title ?? "");

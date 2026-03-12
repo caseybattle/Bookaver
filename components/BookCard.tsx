@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { BookOpen, Trash2 } from "lucide-react";
 import { IBook } from "@/lib/db/models/Book";
+import { sanitizeMarcTitle } from "@/lib/utils";
 
 interface BookCardProps {
   book: IBook & { _id: string };
@@ -18,7 +19,7 @@ export default function BookCard({ book, onDelete }: BookCardProps) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={book.coverUrl}
-            alt={`${book.title} cover`}
+            alt={`${sanitizeMarcTitle(book.title)} cover`}
             className="h-full w-full object-cover"
           />
         ) : (
@@ -42,8 +43,8 @@ export default function BookCard({ book, onDelete }: BookCardProps) {
       {/* Card body */}
       <div className="p-4 flex flex-col gap-3 flex-1">
         <div>
-          <h3 className="font-semibold text-stone-900 dark:text-stone-50 leading-snug line-clamp-2">{book.title}</h3>
-          <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5 truncate">{book.author}</p>
+          <h3 className="font-semibold text-stone-900 dark:text-stone-50 leading-snug line-clamp-2">{sanitizeMarcTitle(book.title)}</h3>
+          <p className="text-sm text-stone-500 dark:text-stone-400 mt-0.5 truncate">{sanitizeMarcTitle(book.author)}</p>
         </div>
         <div className="flex items-center gap-3 text-xs text-stone-400 dark:text-stone-500">
           <span>{book.totalPages} pages</span>

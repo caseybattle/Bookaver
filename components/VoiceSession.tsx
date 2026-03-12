@@ -21,7 +21,7 @@ export default function VoiceSession({ bookId, bookTitle, assistantId }: VoiceSe
   }, [assistantId, bookId, selectedPersonaId, bookTitle, startCall]);
 
   return (
-    <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-8 space-y-8">
+    <div className="bg-stone-50 dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl p-4 sm:p-8 space-y-6 sm:space-y-8">
       <div className="text-center space-y-2">
         <h2 className="text-xl font-semibold text-stone-900 dark:text-stone-50">Talk to "{bookTitle}"</h2>
         <p className="text-sm text-stone-500 dark:text-stone-400">

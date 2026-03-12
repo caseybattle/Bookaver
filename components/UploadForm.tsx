@@ -152,11 +152,14 @@ export default function UploadForm() {
       {/* Open Library catalog search — collapses when pre-filled from catalog */}
       <div>
         {isPreFilled ? (
-          /* Collapsed "book already selected" state */
+          /* Collapsed "book already selected" state — Step 1 complete */
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-stone-700 dark:text-stone-300">
-              Book catalog
-            </label>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-xs font-bold shrink-0">✓</span>
+              <label className="block text-sm font-semibold text-stone-700 dark:text-stone-300">
+                Step 1 — Book selected
+              </label>
+            </div>
             <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
               <Check className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
               <span className="text-sm text-stone-800 dark:text-stone-200 truncate font-medium">
@@ -266,10 +269,27 @@ export default function UploadForm() {
       </div>
 
       {/* Drop zone — primary focus when pre-filled */}
-      {isPreFilled && (
-        <p className="text-sm font-medium text-stone-700 dark:text-stone-300 -mb-2">
-          Now upload your PDF copy:
-        </p>
+      {isPreFilled && !file && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="flex items-center justify-center w-5 h-5 rounded-full bg-amber-500 text-white text-xs font-bold shrink-0">2</span>
+            <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
+              Step 2 — Upload your PDF file
+            </p>
+          </div>
+          <div className="flex items-start gap-2 px-3 py-2.5 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg text-xs text-blue-700 dark:text-blue-300">
+            <span className="shrink-0 mt-0.5">ℹ️</span>
+            <span>Google Books provides the title, author, and cover — but not the book content. You need to upload a PDF of this book from your device so we can index it for voice conversations.</span>
+          </div>
+        </div>
+      )}
+      {isPreFilled && file && (
+        <div className="flex items-center gap-2">
+          <span className="flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-xs font-bold shrink-0">✓</span>
+          <p className="text-sm font-semibold text-stone-700 dark:text-stone-300">
+            Step 2 — PDF selected
+          </p>
+        </div>
       )}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
@@ -277,7 +297,11 @@ export default function UploadForm() {
         onDrop={handleDrop}
         onClick={() => fileRef.current?.click()}
         className={`border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-colors ${
-          dragging ? "border-amber-500 bg-amber-500/5" : "border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-600"
+          dragging
+            ? "border-amber-500 bg-amber-500/5"
+            : isPreFilled && !file
+            ? "border-amber-400 dark:border-amber-600 bg-amber-50/50 dark:bg-amber-950/20 hover:border-amber-500"
+            : "border-stone-300 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-600"
         }`}
       >
         <input

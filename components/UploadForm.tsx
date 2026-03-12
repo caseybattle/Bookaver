@@ -85,8 +85,18 @@ export default function UploadForm() {
     debounceRef.current = setTimeout(() => runSearch(val), 350);
   };
 
+  // Strip MARC subfield codes returned by the OpenLibrary API.
+  // e.g. "Religion and the rise of capitalism : $b A historical study" → "Religion and the rise of capitalism: A historical study"
+  const sanitizeMarcTitle = (raw: string) =>
+    raw
+      .replace(/\s*:\s*\$[a-zA-Z]\s*/g, ": ")  // ": $b " → ": "
+      .replace(/\s*\/\s*\$[a-zA-Z]\s*/g, " ")   // "/ $c " → " "
+      .replace(/\s*\$[a-zA-Z]\s*/g, " ")         // any remaining "$x" → " "
+      .replace(/\s{2,}/g, " ")                    // collapse extra spaces
+      .trim();
+
   const handleSelectResult = (result: OLResult) => {
-    const title = result.title ?? "";
+    const title = sanitizeMarcTitle(result.title ?? "");
     const author = result.author_name?.[0] ?? "";
     const coverUrl = result.cover_i
       ? `https://covers.openlibrary.org/b/id/${result.cover_i}-L.jpg`
@@ -191,7 +201,7 @@ export default function UploadForm() {
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-stone-900 dark:text-stone-50 truncate">
-                        {result.title}
+                        {sanitizeMarcTitle(result.title)}
                       </p>
                       {result.author_name?.[0] && (
                         <p className="text-xs text-stone-500 dark:text-stone-400 truncate">

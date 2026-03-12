@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getVapi } from "./client";
 import type Vapi from "@vapi-ai/web";
+import { VOICE_PERSONAS } from "./constants";
 import {
   startVoiceSession,
   endVoiceSession,
@@ -91,18 +92,44 @@ export function useVapi(): UseVapiReturn {
         dbSessionId = sid;
         dbSessionIdRef.current = sid;
 
-        // 2. Start the Vapi call and capture the call object for its ID
+        // 2. Build per-persona system prompt override
+        const persona = VOICE_PERSONAS.find((p) => p.id === personaId);
+        const systemPrompt = (persona?.systemPrompt ?? "").replace(
+          /\{\{bookTitle\}\}/g,
+          bookTitle
+        );
+
+        // 3. Start the Vapi call and capture the call object for its ID
         const vapi = vapiRef.current ?? getVapi();
-        const call = await vapi.start(assistantId, {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const call = await (vapi.start as any)(assistantId, {
           variableValues: {
             bookId,
             personaId,
             bookTitle,
             searchEndpoint: `${window.location.origin}/api/vapi/search-book`,
           },
+          assistantOverrides: {
+            // Inject persona system prompt — MERGES with dashboard config so
+            // tool definitions (searchBook) are preserved.
+            ...(systemPrompt && {
+              model: {
+                messages: [{ role: "system", content: systemPrompt }],
+              },
+            }),
+            // Stop speaking quickly when user starts talking (numWords = 2 words
+            // of user speech triggers the AI to stop).
+            stopSpeakingPlan: {
+              numWords: 2,
+              voiceSeconds: 0.3,
+              backoffSeconds: 1.0,
+            },
+            // Brief natural pause before AI responds after user stops talking.
+            responseDelaySeconds: 0.5,
+          },
         });
 
-        // 3. Store Vapi call ID so it gets saved when the call ends
+        // 4. Store Vapi call ID so it gets saved when the call ends
         vapiCallIdRef.current = (call as { id?: string } | null)?.id ?? null;
 
         setSessionId(sid);

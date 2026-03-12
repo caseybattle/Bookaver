@@ -68,13 +68,13 @@ export async function POST(req: NextRequest) {
     // ── Tier 2: MongoDB full-text keyword search ──────────────────────────────
     if (segments.length === 0) {
       try {
-        segments = await Segment.find(
+        segments = (await Segment.find(
           { bookId: bookObjectId, $text: { $search: query } },
           { score: { $meta: "textScore" }, content: 1, pageNumber: 1, chunkIndex: 1 }
         )
           .sort({ score: { $meta: "textScore" } })
           .limit(5)
-          .lean();
+          .lean()) as unknown as SegmentLike[];
 
         console.log(`[search-book] text search: ${segments.length} results`);
       } catch (textErr) {
@@ -88,12 +88,12 @@ export async function POST(req: NextRequest) {
       const regexPattern = words.length > 0 ? words.join("|") : query;
 
       try {
-        segments = await Segment.find(
+        segments = (await Segment.find(
           { bookId: bookObjectId, content: { $regex: regexPattern, $options: "i" } },
           { content: 1, pageNumber: 1, chunkIndex: 1 }
         )
           .limit(5)
-          .lean();
+          .lean()) as unknown as SegmentLike[];
 
         console.log(`[search-book] regex scan: ${segments.length} results`);
       } catch (regexErr) {
@@ -103,10 +103,10 @@ export async function POST(req: NextRequest) {
 
     // ── Tier 4: First 3 segments (absolute last resort) ───────────────────────
     if (segments.length === 0) {
-      segments = await Segment.find({ bookId: bookObjectId })
+      segments = (await Segment.find({ bookId: bookObjectId })
         .sort({ chunkIndex: 1 })
         .limit(3)
-        .lean();
+        .lean()) as unknown as SegmentLike[];
 
       console.log(`[search-book] last resort: returning first ${segments.length} segments`);
     }

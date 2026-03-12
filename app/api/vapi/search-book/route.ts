@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
         const scored = embeddedSegments
           .map((seg) => ({
             seg,
-            score: cosineSimilarity(queryEmbedding, (seg as { embedding: number[] }).embedding),
+            score: cosineSimilarity(queryEmbedding, (seg as unknown as { embedding: number[] }).embedding),
           }))
           .sort((a, b) => b.score - a.score)
           .slice(0, 5);

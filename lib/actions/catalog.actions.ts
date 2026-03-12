@@ -28,9 +28,10 @@ export async function addGutenbergBook(book: GutenbergBook) {
   const limits = getPlanLimits(plan);
   const currentBookCount = await Book.countDocuments({ clerkId });
   if (limits.books !== Infinity && currentBookCount >= limits.books) {
-    throw new Error(
-      `Book limit reached. Your ${plan} plan allows ${limits.books} book${limits.books === 1 ? "" : "s"}. Upgrade to add more.`
-    );
+    return {
+      success: false as const,
+      error: `Book limit reached. Your ${plan} plan allows ${limits.books} book${limits.books === 1 ? "" : "s"}. Upgrade to add more.`,
+    };
   }
   // ────────────────────────────────────────────────────────────────────────
 
@@ -41,18 +42,18 @@ export async function addGutenbergBook(book: GutenbergBook) {
     author: getBookAuthor(book),
   }).lean();
   if (existing) {
-    return { success: true, bookId: (existing as { _id: { toString(): string } })._id.toString(), alreadyExists: true };
+    return { success: true as const, bookId: (existing as { _id: { toString(): string } })._id.toString(), alreadyExists: true };
   }
 
   const textUrl = getBookTextUrl(book);
   if (!textUrl) {
-    throw new Error("No plain-text version available for this book.");
+    return { success: false as const, error: "No plain-text version available for this book." };
   }
 
   // Download the book text from Gutenberg
   const textRes = await fetch(textUrl);
   if (!textRes.ok) {
-    throw new Error(`Failed to download book text: ${textRes.status}`);
+    return { success: false as const, error: `Failed to download book text: ${textRes.status}` };
   }
   const rawText = await textRes.text();
   const cleanText = stripGutenbergBoilerplate(rawText);
@@ -132,7 +133,7 @@ export async function addGutenbergBook(book: GutenbergBook) {
   // ────────────────────────────────────────────────────────────────────────
 
   revalidatePath("/");
-  return { success: true, bookId: bookDoc._id.toString(), alreadyExists: false };
+  return { success: true as const, bookId: bookDoc._id.toString(), alreadyExists: false };
 }
 
 export async function addInternetArchiveBook({
@@ -154,9 +155,10 @@ export async function addInternetArchiveBook({
   const limits = getPlanLimits(plan);
   const currentBookCount = await Book.countDocuments({ clerkId });
   if (limits.books !== Infinity && currentBookCount >= limits.books) {
-    throw new Error(
-      `Book limit reached. Your ${plan} plan allows ${limits.books} book${limits.books === 1 ? "" : "s"}. Upgrade to add more.`
-    );
+    return {
+      success: false as const,
+      error: `Book limit reached. Your ${plan} plan allows ${limits.books} book${limits.books === 1 ? "" : "s"}. Upgrade to add more.`,
+    };
   }
   // ────────────────────────────────────────────────────────────────────────
 
@@ -164,7 +166,7 @@ export async function addInternetArchiveBook({
   const existing = await Book.findOne({ clerkId, title, author }).lean();
   if (existing) {
     return {
-      success: true,
+      success: true as const,
       bookId: (existing as { _id: { toString(): string } })._id.toString(),
       alreadyExists: true,
     };
@@ -172,7 +174,7 @@ export async function addInternetArchiveBook({
 
   const textUrl = await getIATextUrl(identifier);
   if (!textUrl) {
-    throw new Error("No plain-text version available for this book.");
+    return { success: false as const, error: "No plain-text version available for this book." };
   }
 
   // Download the book text from Internet Archive
@@ -180,7 +182,7 @@ export async function addInternetArchiveBook({
     headers: { "User-Agent": "Bookaver/1.0 (https://bookaver.vercel.app)" },
   });
   if (!textRes.ok) {
-    throw new Error(`Failed to download book text: ${textRes.status}`);
+    return { success: false as const, error: `Failed to download book text: ${textRes.status}` };
   }
   const rawText = await textRes.text();
 
@@ -248,5 +250,5 @@ export async function addInternetArchiveBook({
   // ────────────────────────────────────────────────────────────────────────
 
   revalidatePath("/");
-  return { success: true, bookId: bookDoc._id.toString(), alreadyExists: false };
+  return { success: true as const, bookId: bookDoc._id.toString(), alreadyExists: false };
 }

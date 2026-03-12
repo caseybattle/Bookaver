@@ -27,14 +27,19 @@ export default function CatalogCard({ book }: CatalogCardProps) {
     setStatus("adding");
     try {
       const result = await addGutenbergBook(book);
+      if (!result.success) {
+        toast.error(result.error);
+        setStatus("idle");
+        return;
+      }
       if (result.alreadyExists) {
         toast.success("Already in your library! Taking you there…");
       } else {
         toast.success(`"${book.title}" added to your library!`);
       }
       router.push(`/books/${result.bookId}`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add book");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
       setStatus("idle");
     }
   };

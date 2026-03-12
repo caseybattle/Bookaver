@@ -32,14 +32,19 @@ export default function IACatalogCard({ book }: IACatalogCardProps) {
         author,
         coverUrl: coverUrl ?? undefined,
       });
+      if (!result.success) {
+        toast.error(result.error);
+        setStatus("idle");
+        return;
+      }
       if (result.alreadyExists) {
         toast.success("Already in your library! Taking you there\u2026");
       } else {
         toast.success(`\u201c${book.title}\u201d added to your library!`);
       }
       router.push(`/books/${result.bookId}`);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to add book");
+    } catch {
+      toast.error("Something went wrong. Please try again.");
       setStatus("idle");
     }
   };

@@ -10,6 +10,7 @@ import {
   getBookTextUrl,
   getBookCoverUrl,
   getBookAuthor,
+  cleanMarcTitle,
   stripGutenbergBoilerplate,
 } from "@/lib/gutenberg";
 import { getIATextUrl } from "@/lib/internet-archive";
@@ -35,10 +36,12 @@ export async function addGutenbergBook(book: GutenbergBook) {
   }
   // ────────────────────────────────────────────────────────────────────────
 
+  const cleanedTitle = cleanMarcTitle(book.title);
+
   // Check if user already has this book
   const existing = await Book.findOne({
     clerkId,
-    title: book.title,
+    title: cleanedTitle,
     author: getBookAuthor(book),
   }).lean();
   if (existing) {
@@ -74,7 +77,7 @@ export async function addGutenbergBook(book: GutenbergBook) {
   // Create Book record
   const bookDoc = await Book.create({
     clerkId,
-    title: book.title,
+    title: cleanedTitle,
     author,
     blobUrl,
     ...(coverUrl ? { coverUrl } : {}),

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { BookOpen, Plus, Check, Loader2, Download } from "lucide-react";
 import { toast } from "sonner";
 import { addGutenbergBook } from "@/lib/actions/catalog.actions";
-import { GutenbergBook, getBookAuthor, getBookCoverUrl, getBookTextUrl } from "@/lib/gutenberg";
+import { GutenbergBook, getBookAuthor, getBookCoverUrl, getBookTextUrl, cleanMarcTitle } from "@/lib/gutenberg";
 
 interface CatalogCardProps {
   book: GutenbergBook;
@@ -18,6 +18,7 @@ export default function CatalogCard({ book }: CatalogCardProps) {
   const coverUrl = getBookCoverUrl(book);
   const author = getBookAuthor(book);
   const hasText = !!getBookTextUrl(book);
+  const displayTitle = cleanMarcTitle(book.title);
 
   const handleAdd = async () => {
     if (!hasText) {
@@ -35,7 +36,7 @@ export default function CatalogCard({ book }: CatalogCardProps) {
       if (result.alreadyExists) {
         toast.success("Already in your library! Taking you there…");
       } else {
-        toast.success(`"${book.title}" added to your library!`);
+        toast.success(`"${displayTitle}" added to your library!`);
       }
       router.push(`/books/${result.bookId}`);
     } catch {
@@ -100,7 +101,7 @@ export default function CatalogCard({ book }: CatalogCardProps) {
       {/* Info */}
       <div className="p-3 flex flex-col gap-1.5">
         <h3 className="font-semibold text-stone-900 dark:text-stone-50 text-sm leading-snug line-clamp-2">
-          {book.title}
+          {displayTitle}
         </h3>
         <p className="text-xs text-stone-500 dark:text-stone-400 truncate">{author}</p>
       </div>

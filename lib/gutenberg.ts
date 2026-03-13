@@ -47,6 +47,11 @@ export function getBookCoverUrl(book: GutenbergBook): string | null {
   );
 }
 
+/** Strip MARC subfield delimiters (e.g. " : $b ", " $c ") from Gutenberg book titles */
+export function cleanMarcTitle(raw: string): string {
+  return raw.replace(/\s*\$[a-z]\s*/g, " ").trim();
+}
+
 /** Primary author display name */
 export function getBookAuthor(book: GutenbergBook): string {
   if (!book.authors.length) return "Unknown Author";
